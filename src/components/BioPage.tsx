@@ -1,12 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { siApplemusic, siDeezer, siSpotify } from "simple-icons";
 
 import logo from "../assets/era-logo.png.asset.json";
-import { playlists, type Playlist } from "../data/playlists";
-import { getPlaylistSource, trackClick } from "../lib/track";
+import { type Playlist } from "../data/playlists";
+import { trackClick, type PlaylistSource } from "../lib/track";
 
-type ServiceKey = "spotify" | "apple" | "deezer";
+export type ServiceKey = "spotify" | "apple" | "deezer";
 
 const icons = {
   spotify: siSpotify,
@@ -14,11 +14,7 @@ const icons = {
   deezer: siDeezer,
 };
 
-function getPlaylist(slug: string) {
-  return playlists.find((playlist) => playlist.slug === slug);
-}
-
-function PlatformIcon({ platform }: { platform: ServiceKey }) {
+export function PlatformIcon({ platform }: { platform: ServiceKey }) {
   return (
     <svg className="bio-dsp-icon" viewBox="0 0 24 24" aria-hidden="true">
       <path d={icons[platform].path} fill="currentColor" />
@@ -26,45 +22,7 @@ function PlatformIcon({ platform }: { platform: ServiceKey }) {
   );
 }
 
-export const Route = createFileRoute("/bio/$slug")({
-  head: ({ params }) => {
-    const playlist = getPlaylist(params.slug);
-    if (!playlist) {
-      return {
-        meta: [
-          { title: "Playlist not found — ERA Music" },
-          { name: "description", content: "This ERA Music playlist is unavailable." },
-          { name: "robots", content: "noindex" },
-        ],
-      };
-    }
-
-    const title = `${playlist.title} — ERA Music`;
-    return {
-      meta: [
-        { title },
-        { name: "description", content: playlist.hook },
-        { property: "og:title", content: title },
-        { property: "og:description", content: playlist.hook },
-        { property: "og:type", content: "website" },
-        { property: "og:image", content: playlist.cover },
-        { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:image", content: playlist.cover },
-      ],
-    };
-  },
-  component: BioRoute,
-});
-
-function BioRoute() {
-  const { slug } = Route.useParams();
-  const playlist = getPlaylist(slug);
-
-  if (!playlist) return <PlaylistNotFound />;
-  return <PlaylistPage playlist={playlist} />;
-}
-
-function PlaylistNotFound() {
+export function PlaylistNotFound() {
   return (
     <main className="bio-not-found">
       <Link to="/" aria-label="ERA Music — home">
@@ -75,43 +33,14 @@ function PlaylistNotFound() {
   );
 }
 
-function PlaylistPage({ playlist }: { playlist: Playlist }) {
+export function useCoverAccent(cover: string) {
   const pageRef = useRef<HTMLElement>(null);
-  const actionsRef = useRef<HTMLDivElement>(null);
-  const [showSticky, setShowSticky] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const source = useMemo(
-    () => (typeof window === "undefined" ? "direct" : getPlaylistSource(window.location.search)),
-    [],
-  );
-
-  const services = useMemo(
-    () =>
-      ([
-        { key: "spotify", label: "Listen on Spotify", href: playlist.spotify, primary: true },
-        { key: "apple", label: "Listen on Apple Music", href: playlist.apple, primary: false },
-        { key: "deezer", label: "Listen on Deezer", href: playlist.deezer, primary: false },
-      ] as const).filter((service) => service.href),
-    [playlist],
-  );
-
-  useEffect(() => {
-    const actions = actionsRef.current;
-    if (!actions) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => setShowSticky(!entry?.isIntersecting),
-      { threshold: 0.05 },
-    );
-    observer.observe(actions);
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     const page = pageRef.current;
     const image = new Image();
     image.crossOrigin = "anonymous";
-    image.src = playlist.cover;
+    image.src = cover;
     image.onload = () => {
       try {
         const canvas = document.createElement("canvas");
@@ -141,7 +70,40 @@ function PlaylistPage({ playlist }: { playlist: Playlist }) {
         // Cross-origin covers retain the off-white fallback accent.
       }
     };
-  }, [playlist.cover]);
+  }, [cover]);
+
+  return pageRef;
+}
+
+export function BioPage({ playlist, src }: { playlist: Playlist; src: PlaylistSource }) {
+  const pageRef = useCoverAccent(playlist.cover);
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const [showSticky, setShowSticky] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const services = useMemo(
+    () =>
+      ([
+        { key: "spotify", label: "Listen on Spotify", href: playlist.spotify, primary: true },
+        { key: "apple", label: "Listen on Apple Music", href: playlist.apple, primary: false },
+        { key: "deezer", label: "Listen on Deezer", href: playlist.deezer, primary: false },
+      ] as const).filter((service) => service.href),
+    [playlist],
+  );
+
+  const outHref = (dsp: ServiceKey) => `/out/${playlist.slug}/${dsp}/${src}`;
+
+  useEffect(() => {
+    const actions = actionsRef.current;
+    if (!actions) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowSticky(!entry?.isIntersecting),
+      { threshold: 0.05 },
+    );
+    observer.observe(actions);
+    return () => observer.disconnect();
+  }, []);
 
   async function sharePlaylist() {
     const url = window.location.href;
@@ -178,11 +140,9 @@ function PlaylistPage({ playlist }: { playlist: Playlist }) {
           {services.map((service, index) => (
             <a
               key={service.key}
-              href={service.href}
-              target="_blank"
-              rel="noreferrer"
+              href={outHref(service.key)}
               className={`bio-dsp bio-enter bio-enter-${index + 4} ${service.primary ? "bio-dsp-primary" : "bio-dsp-glass"}`}
-              onClick={() => trackClick(playlist.slug, service.key, source)}
+              onClick={() => trackClick(playlist.slug, service.key, src)}
             >
               <PlatformIcon platform={service.key} />
               <span className="bio-dsp-copy">
@@ -218,12 +178,10 @@ function PlaylistPage({ playlist }: { playlist: Playlist }) {
           <img src={playlist.cover} alt="" className="bio-sticky-cover" />
           <span className="bio-sticky-title">{playlist.title}</span>
           <a
-            href={playlist.spotify}
-            target="_blank"
-            rel="noreferrer"
+            href={outHref("spotify")}
             tabIndex={showSticky ? 0 : -1}
             className="bio-sticky-listen"
-            onClick={() => trackClick(playlist.slug, "spotify", source)}
+            onClick={() => trackClick(playlist.slug, "spotify", src)}
           >
             <PlatformIcon platform="spotify" />
             Listen

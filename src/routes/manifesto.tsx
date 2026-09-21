@@ -2,25 +2,31 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import logo from "../assets/era-logo.png.asset.json";
 
+const DESCRIPTION =
+  "Music is not the reward for the effort. It is the vehicle of it.";
+
 export const Route = createFileRoute("/manifesto")({
   head: () => ({
     meta: [
       { title: "Manifesto — ERA Music" },
-      { name: "description", content: "The ERA Music manifesto." },
+      { name: "description", content: DESCRIPTION },
       { property: "og:title", content: "Manifesto — ERA Music" },
-      { property: "og:description", content: "The ERA Music manifesto." },
+      { property: "og:description", content: DESCRIPTION },
     ],
   }),
   component: Manifesto,
 });
 
 const PARAGRAPHS = [
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Nullam quis risus eget urna mollis ornare vel eu leo.",
-  "Cras mattis consectetur purus sit amet fermentum. Donec ullamcorper nulla non metus auctor fringilla. Maecenas faucibus mollis interdum, aenean lacinia bibendum nulla sed consectetur.",
-  "Vestibulum id ligula porta felis euismod semper. Curabitur blandit tempus porttitor. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Sed posuere consectetur est at lobortis.",
-  "Nulla vitae elit libero, a pharetra augue. Etiam porta sem malesuada magna mollis euismod. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.",
-  "Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.",
+  "Music is not the reward for the effort. It is the vehicle of it.",
+  "The right sound, at the right moment, does not make the effort easier. It makes it possible.",
+  "There is a moment in every run when you could still stop, and you don't. That moment has a sound. We exist to sign it.",
+  "Some run to be in the moment. Some run for no one. The music is the same. One is why it travels. The other is why it lasts.",
+  "ERA is run by someone who runs. Early, alone, at cadence. Every record here was played there first.",
+  "We will not tell you how hard to go. The effort is yours. The sound is ours.",
 ];
+
+const SIGNATURE = ["Becoming has a sound.", "Music for Motion."];
 
 function Manifesto() {
   return (
@@ -34,6 +40,11 @@ function Manifesto() {
       <div className="mt-10 space-y-7 text-base leading-[1.9]">
         {PARAGRAPHS.map((p) => (
           <p key={p}>{p}</p>
+        ))}
+      </div>
+      <div className="mt-16 space-y-7 text-base leading-[1.9] opacity-70">
+        {SIGNATURE.map((line) => (
+          <p key={line}>{line}</p>
         ))}
       </div>
     </main>
