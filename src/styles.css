@@ -142,3 +142,65 @@
     color: var(--color-foreground);
   }
 }
+
+/* ---- ERA Music ---- */
+@font-face {
+  font-family: "N27";
+  src: url("/__l5e/assets-v1/653f3047-c8e6-466e-8b78-e26a8f73c4f6/N27-Light.otf") format("opentype");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: "N27";
+  src: url("/__l5e/assets-v1/941cb3bd-20bd-431f-b8e8-f41532ab4838/N27-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "N27";
+  src: url("/__l5e/assets-v1/5a8ade2c-9888-4635-9580-10d1f451f843/N27-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "N27";
+  src: url("/__l5e/assets-v1/a9c31609-1745-4922-b7f2-8a45732e2fb1/N27-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --bg: #0a0a0a;
+  --fg: #f2f2f0;
+  --muted: #8a8a88;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "N27", system-ui, sans-serif;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+
+.era-logo {
+  filter: invert(1);
+}
+
+.era-caret {
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  margin-left: 0.15em;
+  background: var(--fg);
+  vertical-align: -0.12em;
+  animation: era-blink 1s step-end infinite;
+}
+@keyframes era-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .era-caret { display: none; }
+}
