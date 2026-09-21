@@ -1,113 +1,235 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { siApplemusic, siDeezer, siSpotify } from "simple-icons";
 
 import logo from "../assets/era-logo.png.asset.json";
-import { playlists } from "../data/playlists";
+import { playlists, type Playlist } from "../data/playlists";
+import { getPlaylistSource, trackClick } from "../lib/track";
 
-const playlist = playlists[0];
+type ServiceKey = "spotify" | "apple" | "deezer";
 
-export function trackClick(slug: string, dsp: string, src: string) {
-  if (typeof window === "undefined") return;
+const icons = {
+  spotify: siSpotify,
+  apple: siApplemusic,
+  deezer: siDeezer,
+};
 
-  window.dispatchEvent(
-    new CustomEvent("era:playlist-click", {
-      detail: { slug, dsp, src },
-    }),
-  );
-
-  const analyticsWindow = window as Window & {
-    plausible?: (event: string, options: { props: Record<string, string> }) => void;
-  };
-  analyticsWindow.plausible?.("Playlist Click", {
-    props: { slug, dsp, src },
-  });
+function getPlaylist(slug: string) {
+  return playlists.find((playlist) => playlist.slug === slug);
 }
 
-const SpotifyIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" className="size-6 shrink-0 fill-current">
-    <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.58 14.42a.75.75 0 0 1-1.03.25c-2.82-1.72-6.38-2.11-10.56-1.16a.75.75 0 1 1-.33-1.46c4.58-1.04 8.51-.59 11.67 1.34.35.21.46.67.25 1.03Zm1.47-3.27a.94.94 0 0 1-1.29.31c-3.23-1.98-8.15-2.55-11.97-1.39a.94.94 0 1 1-.55-1.79c4.37-1.33 9.79-.69 13.5 1.58.44.27.58.85.31 1.29Zm.13-3.4C14.31 7.45 7.92 7.24 4.23 8.36A1.12 1.12 0 1 1 3.58 6.2c4.24-1.29 11.3-1.04 15.75 1.6a1.12 1.12 0 0 1-1.15 1.94Z" />
-  </svg>
-);
-
-const AppleIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" className="size-6 shrink-0 fill-current">
-    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.79 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.09ZM12.03 7.25C11.88 5.02 13.69 3.18 15.77 3c.29 2.58-2.34 4.5-3.74 4.25Z" />
-  </svg>
-);
-
-const DeezerIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" className="size-6 shrink-0 fill-current">
-    <path d="M2 16h4v3H2v-3Zm0-4h4v3H2v-3Zm5 4h4v3H7v-3Zm0-8h4v3H7V8Zm0 4h4v3H7v-3Zm5 4h4v3h-4v-3Zm0-8h4v3h-4V8Zm5 8h5v3h-5v-3Zm0-4h5v3h-5v-3ZM12 4h4v3h-4V4Z" />
-  </svg>
-);
+function PlatformIcon({ platform }: { platform: ServiceKey }) {
+  return (
+    <svg className="bio-dsp-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d={icons[platform].path} fill="currentColor" />
+    </svg>
+  );
+}
 
 export const Route = createFileRoute("/bio/$slug")({
-  head: () => ({
-    meta: [
-      { title: "Running Songs — ERA Music" },
-      { name: "description", content: playlist.description },
-      { property: "og:title", content: "Running Songs — ERA Music" },
-      { property: "og:description", content: playlist.description },
-      { property: "og:type", content: "website" },
-      { property: "og:image", content: playlist.cover },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: playlist.cover },
-    ],
-  }),
-  component: Bio,
+  head: ({ params }) => {
+    const playlist = getPlaylist(params.slug);
+    if (!playlist) {
+      return {
+        meta: [
+          { title: "Playlist not found — ERA Music" },
+          { name: "description", content: "This ERA Music playlist is unavailable." },
+          { name: "robots", content: "noindex" },
+        ],
+      };
+    }
+
+    const title = `${playlist.title} — ERA Music`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: playlist.hook },
+        { property: "og:title", content: title },
+        { property: "og:description", content: playlist.hook },
+        { property: "og:type", content: "website" },
+        { property: "og:image", content: playlist.cover },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:image", content: playlist.cover },
+      ],
+    };
+  },
+  component: BioRoute,
 });
 
-function Bio() {
-  const services = [
-    { key: "spotify", label: "Listen on Spotify", href: playlist.spotify, icon: SpotifyIcon, primary: true },
-    { key: "apple", label: "Listen on Apple Music", href: playlist.apple, icon: AppleIcon, primary: false },
-    { key: "deezer", label: "Listen on Deezer", href: playlist.deezer, icon: DeezerIcon, primary: false },
-  ].filter((service) => service.href);
+function BioRoute() {
+  const { slug } = Route.useParams();
+  const playlist = getPlaylist(slug);
+
+  if (!playlist) return <PlaylistNotFound />;
+  return <PlaylistPage playlist={playlist} />;
+}
+
+function PlaylistNotFound() {
+  return (
+    <main className="bio-not-found">
+      <Link to="/" aria-label="ERA Music — home">
+        <img src={logo.url} alt="ERA Music" className="era-logo" />
+      </Link>
+      <Link to="/">Back home</Link>
+    </main>
+  );
+}
+
+function PlaylistPage({ playlist }: { playlist: Playlist }) {
+  const pageRef = useRef<HTMLElement>(null);
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const [showSticky, setShowSticky] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const source = useMemo(
+    () => (typeof window === "undefined" ? "direct" : getPlaylistSource(window.location.search)),
+    [],
+  );
+
+  const services = useMemo(
+    () =>
+      ([
+        { key: "spotify", label: "Listen on Spotify", href: playlist.spotify, primary: true },
+        { key: "apple", label: "Listen on Apple Music", href: playlist.apple, primary: false },
+        { key: "deezer", label: "Listen on Deezer", href: playlist.deezer, primary: false },
+      ] as const).filter((service) => service.href),
+    [playlist],
+  );
+
+  useEffect(() => {
+    const actions = actionsRef.current;
+    if (!actions) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowSticky(!entry?.isIntersecting),
+      { threshold: 0.05 },
+    );
+    observer.observe(actions);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const page = pageRef.current;
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.src = playlist.cover;
+    image.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = 32;
+        canvas.height = 32;
+        const context = canvas.getContext("2d", { willReadFrequently: true });
+        if (!context || !page) return;
+        context.drawImage(image, 0, 0, 32, 32);
+        const pixels = context.getImageData(0, 0, 32, 32).data;
+        let winner = { score: -1, r: 245, g: 245, b: 242 };
+        for (let index = 0; index < pixels.length; index += 16) {
+          const r = pixels[index] ?? 0;
+          const g = pixels[index + 1] ?? 0;
+          const b = pixels[index + 2] ?? 0;
+          const max = Math.max(r, g, b);
+          const min = Math.min(r, g, b);
+          const saturation = max ? (max - min) / max : 0;
+          const lightness = (max + min) / 510;
+          const score = saturation * (1 - Math.abs(lightness - 0.55));
+          if (score > winner.score && lightness > 0.2 && lightness < 0.85) {
+            winner = { score, r, g, b };
+          }
+        }
+        page.style.setProperty("--bio-accent", `rgb(${winner.r} ${winner.g} ${winner.b})`);
+        page.style.setProperty("--bio-accent-rgb", `${winner.r} ${winner.g} ${winner.b}`);
+      } catch {
+        // Cross-origin covers retain the off-white fallback accent.
+      }
+    };
+  }, [playlist.cover]);
+
+  async function sharePlaylist() {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: playlist.title, url });
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  }
 
   return (
-    <main className="bio-page">
-      <div
-        className="bio-backdrop"
-        style={{ backgroundImage: `url(${playlist.cover})` }}
-        aria-hidden="true"
-      />
+    <main ref={pageRef} className="bio-page">
+      <div className="bio-backdrop" style={{ backgroundImage: `url(${playlist.cover})` }} aria-hidden="true" />
       <div className="bio-scrim" aria-hidden="true" />
+      <div className="bio-grain" aria-hidden="true" />
 
-      <section className="bio-content" aria-labelledby="playlist-title">
-        <img
-          className="bio-cover bio-enter bio-enter-1"
-          src={playlist.cover}
-          alt={`${playlist.title} playlist cover`}
-          width={320}
-          height={320}
-        />
-        <h1 id="playlist-title" className="bio-title bio-enter bio-enter-2">
-          {playlist.title}
-        </h1>
-        <p className="bio-description bio-enter bio-enter-3">{playlist.description}</p>
+      <section className="bio-hero" aria-labelledby="playlist-title">
+        <img className="bio-cover bio-enter bio-enter-1" src={playlist.cover} alt={`${playlist.title} playlist cover`} width={320} height={320} crossOrigin="anonymous" />
+        <h1 id="playlist-title" className="bio-title bio-enter bio-enter-2">{playlist.title}</h1>
+        <p className="bio-hook bio-enter bio-enter-3">{playlist.hook}</p>
 
-        <div className="bio-actions" aria-label="Listen to this playlist">
-          {services.map((service, index) => {
-            const Icon = service.icon;
-            return (
-              <a
-                key={service.key}
-                href={service.href}
-                target="_blank"
-                rel="noreferrer"
-                className={`bio-dsp bio-enter bio-enter-${index + 4} ${service.primary ? "bio-dsp-primary" : "bio-dsp-glass"}`}
-                onClick={() => trackClick(playlist.slug, service.key, "bio")}
-              >
-                <Icon />
+        <div ref={actionsRef} className="bio-actions" aria-label="Listen to this playlist">
+          {services.map((service, index) => (
+            <a
+              key={service.key}
+              href={service.href}
+              target="_blank"
+              rel="noreferrer"
+              className={`bio-dsp bio-enter bio-enter-${index + 4} ${service.primary ? "bio-dsp-primary" : "bio-dsp-glass"}`}
+              onClick={() => trackClick(playlist.slug, service.key, source)}
+            >
+              <PlatformIcon platform={service.key} />
+              <span className="bio-dsp-copy">
                 <span>{service.label}</span>
-              </a>
-            );
-          })}
+                {playlist.stats?.[service.key] ? <small className="bio-dsp-stat">{playlist.stats[service.key]}</small> : null}
+              </span>
+              <span aria-hidden="true" />
+            </a>
+          ))}
         </div>
-
-        <Link to="/" aria-label="ERA Music — home" className="bio-home bio-enter bio-enter-7">
-          <img src={logo.url} alt="ERA Music" className="era-logo" />
-        </Link>
+        <span className="bio-scroll-cue" aria-hidden="true" />
       </section>
+
+      <section className="bio-story" aria-label="About this playlist">
+        <p className="bio-body">{playlist.body}</p>
+        <p className="bio-artists">{playlist.artists}</p>
+        <div className="bio-moments" aria-label="Made for">
+          {playlist.moments.map((moment) => <span className="bio-chip" key={moment}>{moment}</span>)}
+        </div>
+        <button type="button" className="bio-share" onClick={sharePlaylist} aria-live="polite">
+          {copied ? "link copied" : "send it to the friend you run with."}
+        </button>
+        <footer className="bio-footer">
+          <Link to="/" aria-label="ERA Music — home" className="bio-home">
+            <img src={logo.url} alt="ERA Music" className="era-logo" />
+          </Link>
+          <span>Selected by ERA Music. Music for Motion.</span>
+        </footer>
+      </section>
+
+      <aside className={`bio-sticky ${showSticky ? "bio-sticky-visible" : ""}`} aria-hidden={!showSticky}>
+        <div className="bio-sticky-inner">
+          <img src={playlist.cover} alt="" className="bio-sticky-cover" />
+          <span className="bio-sticky-title">{playlist.title}</span>
+          <a
+            href={playlist.spotify}
+            target="_blank"
+            rel="noreferrer"
+            tabIndex={showSticky ? 0 : -1}
+            className="bio-sticky-listen"
+            onClick={() => trackClick(playlist.slug, "spotify", source)}
+          >
+            <PlatformIcon platform="spotify" />
+            Listen
+          </a>
+        </div>
+      </aside>
     </main>
   );
 }
