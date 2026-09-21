@@ -308,6 +308,7 @@ body {
   border-radius: 14px;
   display: grid;
   grid-template-columns: 22px 1fr 22px;
+  grid-template-rows: 1fr;
   align-items: center;
   gap: 0.875rem;
   font-size: 1rem;
@@ -318,8 +319,12 @@ body {
   transition: transform 100ms ease-out, background-color 100ms ease-out;
 }
 
-.bio-dsp span {
+.bio-dsp > .bio-dsp-copy {
   grid-column: 2;
+}
+
+.bio-dsp > span[aria-hidden="true"] {
+  grid-column: 3;
 }
 
 .bio-dsp-icon {
