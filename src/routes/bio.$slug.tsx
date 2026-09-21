@@ -40,7 +40,7 @@ const DeezerIcon = () => (
   </svg>
 );
 
-export const Route = createFileRoute("/bio")({
+export const Route = createFileRoute("/bio/$slug")({
   head: () => ({
     meta: [
       { title: "Running Songs — ERA Music" },
