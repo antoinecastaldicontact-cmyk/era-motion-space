@@ -204,3 +204,230 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .era-caret { display: none; }
 }
+
+/* ---- ERA Music playlist bio ---- */
+.bio-page {
+  --bio-white: #f5f5f2;
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: #0a0a0a;
+  color: var(--bio-white);
+}
+
+.bio-backdrop,
+.bio-scrim {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bio-backdrop {
+  z-index: -2;
+  background-position: center;
+  background-size: cover;
+  filter: blur(80px) saturate(140%);
+  transform: scale(1.2);
+}
+
+.bio-scrim {
+  z-index: -1;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.75));
+}
+
+.bio-content {
+  width: min(100%, 420px);
+  min-height: 100dvh;
+  margin-inline: auto;
+  padding: max(2rem, env(safe-area-inset-top)) max(1.25rem, env(safe-area-inset-right)) max(1.5rem, env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.bio-cover {
+  width: min(72vw, 320px);
+  aspect-ratio: 1;
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  object-fit: cover;
+}
+
+.bio-title {
+  margin-top: 1.75rem;
+  font-family: "N27", system-ui, sans-serif;
+  font-size: clamp(1.75rem, 7vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--bio-white);
+}
+
+.bio-description {
+  margin-top: 0.65rem;
+  font-family: "N27", system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.bio-actions {
+  width: 100%;
+  margin-top: 1.75rem;
+  display: grid;
+  gap: 12px;
+}
+
+.bio-dsp {
+  position: relative;
+  width: 100%;
+  height: 56px;
+  padding-inline: 1.25rem;
+  border-radius: 14px;
+  display: grid;
+  grid-template-columns: 1.5rem 1fr 1.5rem;
+  align-items: center;
+  gap: 0.875rem;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 100ms ease-out, background-color 100ms ease-out;
+}
+
+.bio-dsp span {
+  grid-column: 2;
+}
+
+.bio-dsp-primary {
+  background: var(--bio-white);
+  color: #0a0a0a;
+}
+
+.bio-dsp-glass {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+.bio-dsp:active {
+  transform: scale(0.97);
+}
+
+.bio-dsp-glass:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.bio-dsp:focus-visible,
+.bio-home:focus-visible {
+  outline: 2px solid var(--bio-white);
+  outline-offset: 3px;
+}
+
+.bio-home {
+  margin-top: 2rem;
+  display: block;
+  opacity: 0.45;
+  transition: opacity 100ms ease-out;
+}
+
+.bio-home img {
+  width: 4.5rem;
+}
+
+.bio-home:hover,
+.bio-home:active {
+  opacity: 0.8;
+}
+
+.bio-enter {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: bio-arrive 400ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.bio-enter-1 { animation-delay: 0ms; }
+.bio-enter-2 { animation-delay: 50ms; }
+.bio-enter-3 { animation-delay: 100ms; }
+.bio-enter-4 { animation-delay: 150ms; }
+.bio-enter-5 { animation-delay: 200ms; }
+.bio-enter-6 { animation-delay: 250ms; }
+.bio-enter-7 { animation-delay: 300ms; }
+
+.bio-dsp-glass.bio-enter {
+  -webkit-backdrop-filter: blur(0) saturate(180%);
+  backdrop-filter: blur(0) saturate(180%);
+  transform: translateY(12px) scale(0.98);
+  animation-name: bio-glass-arrive;
+}
+
+@keyframes bio-arrive {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bio-glass-arrive {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bio-enter,
+  .bio-dsp-glass.bio-enter {
+    transform: none;
+    animation-name: bio-fade;
+    animation-duration: 200ms;
+  }
+
+  .bio-dsp,
+  .bio-home {
+    transition: none;
+  }
+
+  .bio-dsp:active {
+    transform: none;
+  }
+}
+
+@keyframes bio-fade {
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .bio-dsp-glass,
+  .bio-dsp-glass.bio-enter {
+    background: rgba(30, 30, 30, 0.95);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .bio-description { color: #fff; }
+  .bio-dsp-glass,
+  .bio-dsp-glass.bio-enter {
+    background: #1e1e1e;
+    border: 1px solid #fff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (max-height: 720px) {
+  .bio-content { justify-content: flex-start; }
+}
