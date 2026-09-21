@@ -41,4 +41,46 @@ export const playlists: Playlist[] = [
     apple: "",
     deezer: "",
   },
+  {
+    slug: "high-energy-running-songs",
+    spotifyId: "0pDP8njArqxBYGavr3sJSH",
+    spotifyTitle:
+      "High Energy Running Songs EDM ⚡ | 125-160 BPM | Running Lock-In",
+    title: "High Energy Running Songs",
+    description: "The songs I run to when I want it loud.",
+    hook: "the songs for the days you want it loud.",
+    body: "Headphones in, volume up, and the street turns into your own music video. The tempo your feet already know.",
+    artists: "64 songs. 125 to 160 BPM.",
+    moments: [
+      "for the first sunny saturday",
+      "for the playlist you'll send to the group chat",
+      "for the treadmill that needs help",
+    ],
+    cover:
+      "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000d72cbc3ad1ab33b6e2f6ed99832a",
+    spotify: "https://open.spotify.com/playlist/0pDP8njArqxBYGavr3sJSH",
+    apple: "",
+    deezer: "",
+  },
+  {
+    slug: "evening-run-playlist",
+    spotifyId: "65M1aM0mOu6bZjqvBILTDw",
+    spotifyTitle:
+      "Evening Run Playlist 🌇 Sunset Miles | Summer Running Music",
+    title: "Evening Run Playlist",
+    description: "The songs I run to when the day is done.",
+    hook: "the songs for the run after a long day.",
+    body: "The sky goes orange, the city slows down, and the day finally lets go of you. Slower, warmer, made for the last light.",
+    artists: "100 songs. Sunset tempo.",
+    moments: [
+      "for sunset",
+      "for the long way home",
+      "for the summer evenings that don't end",
+    ],
+    cover:
+      "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000d72cc04756193d14fe2fe9e7ce0c",
+    spotify: "https://open.spotify.com/playlist/65M1aM0mOu6bZjqvBILTDw",
+    apple: "",
+    deezer: "",
+  },
 ];
