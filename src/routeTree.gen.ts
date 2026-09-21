@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ManifestoRouteImport } from './routes/manifesto'
 import { Route as BioSlugRouteImport } from './routes/bio.$slug'
+import { Route as BioSlugIndexRouteImport } from './routes/bio.$slug.index'
+import { Route as BioSlugSrcRouteImport } from './routes/bio.$slug.$src'
+import { Route as OutSlugDspSrcRouteImport } from './routes/out.$slug.$dsp.$src'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +31,77 @@ const BioSlugRoute = BioSlugRouteImport.update({
   path: '/bio/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BioSlugIndexRoute = BioSlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => BioSlugRoute,
+} as any)
+const BioSlugSrcRoute = BioSlugSrcRouteImport.update({
+  id: '/$src',
+  path: '/$src',
+  getParentRoute: () => BioSlugRoute,
+} as any)
+const OutSlugDspSrcRoute = OutSlugDspSrcRouteImport.update({
+  id: '/out/$slug/$dsp/$src',
+  path: '/out/$slug/$dsp/$src',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/manifesto': typeof ManifestoRoute
-  '/bio/$slug': typeof BioSlugRoute
+  '/bio/$slug': typeof BioSlugRouteWithChildren
+  '/bio/$slug/$src': typeof BioSlugSrcRoute
+  '/bio/$slug/': typeof BioSlugIndexRoute
+  '/out/$slug/$dsp/$src': typeof OutSlugDspSrcRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/manifesto': typeof ManifestoRoute
-  '/bio/$slug': typeof BioSlugRoute
+  '/bio/$slug/$src': typeof BioSlugSrcRoute
+  '/bio/$slug': typeof BioSlugIndexRoute
+  '/out/$slug/$dsp/$src': typeof OutSlugDspSrcRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/manifesto': typeof ManifestoRoute
-  '/bio/$slug': typeof BioSlugRoute
+  '/bio/$slug': typeof BioSlugRouteWithChildren
+  '/bio/$slug/$src': typeof BioSlugSrcRoute
+  '/bio/$slug/': typeof BioSlugIndexRoute
+  '/out/$slug/$dsp/$src': typeof OutSlugDspSrcRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/manifesto' | '/bio/$slug'
+  fullPaths:
+    | '/'
+    | '/manifesto'
+    | '/bio/$slug'
+    | '/bio/$slug/$src'
+    | '/bio/$slug/'
+    | '/out/$slug/$dsp/$src'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/manifesto' | '/bio/$slug'
-  id: '__root__' | '/' | '/manifesto' | '/bio/$slug'
+  to:
+    | '/'
+    | '/manifesto'
+    | '/bio/$slug/$src'
+    | '/bio/$slug'
+    | '/out/$slug/$dsp/$src'
+  id:
+    | '__root__'
+    | '/'
+    | '/manifesto'
+    | '/bio/$slug'
+    | '/bio/$slug/$src'
+    | '/bio/$slug/'
+    | '/out/$slug/$dsp/$src'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ManifestoRoute: typeof ManifestoRoute
-  BioSlugRoute: typeof BioSlugRoute
+  BioSlugRoute: typeof BioSlugRouteWithChildren
+  OutSlugDspSrcRoute: typeof OutSlugDspSrcRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,13 +127,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BioSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/bio/$slug/': {
+      id: '/bio/$slug/'
+      path: '/'
+      fullPath: '/bio/$slug/'
+      preLoaderRoute: typeof BioSlugIndexRouteImport
+      parentRoute: typeof BioSlugRoute
+    }
+    '/bio/$slug/$src': {
+      id: '/bio/$slug/$src'
+      path: '/$src'
+      fullPath: '/bio/$slug/$src'
+      preLoaderRoute: typeof BioSlugSrcRouteImport
+      parentRoute: typeof BioSlugRoute
+    }
+    '/out/$slug/$dsp/$src': {
+      id: '/out/$slug/$dsp/$src'
+      path: '/out/$slug/$dsp/$src'
+      fullPath: '/out/$slug/$dsp/$src'
+      preLoaderRoute: typeof OutSlugDspSrcRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
+
+interface BioSlugRouteChildren {
+  BioSlugSrcRoute: typeof BioSlugSrcRoute
+  BioSlugIndexRoute: typeof BioSlugIndexRoute
+}
+
+const BioSlugRouteChildren: BioSlugRouteChildren = {
+  BioSlugSrcRoute: BioSlugSrcRoute,
+  BioSlugIndexRoute: BioSlugIndexRoute,
+}
+
+const BioSlugRouteWithChildren =
+  BioSlugRoute._addFileChildren(BioSlugRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ManifestoRoute: ManifestoRoute,
-  BioSlugRoute: BioSlugRoute,
+  BioSlugRoute: BioSlugRouteWithChildren,
+  OutSlugDspSrcRoute: OutSlugDspSrcRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

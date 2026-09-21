@@ -3,11 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import logo from "../assets/era-logo.png.asset.json";
 import { Typewriter } from "../components/Typewriter";
 
-const PHRASES = [
-  "Scores for film and image.",
-  "Sound design for brands.",
-  "Original music, made to move.",
-];
+const PHRASES = ["Becoming has a sound."];
 
 export const Route = createFileRoute("/")({
   head: () => ({

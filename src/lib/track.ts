@@ -2,6 +2,12 @@ export type PlaylistSource = "marie" | "antoine" | "era" | "direct";
 
 const ALLOWED_SOURCES = new Set<PlaylistSource>(["marie", "antoine", "era"]);
 
+export function normalizePlaylistSource(value: string | null | undefined): PlaylistSource {
+  return value && ALLOWED_SOURCES.has(value as PlaylistSource)
+    ? (value as PlaylistSource)
+    : "direct";
+}
+
 export function getPlaylistSource(search: string): PlaylistSource {
   const source = new URLSearchParams(search).get("src") as PlaylistSource | null;
   return source && ALLOWED_SOURCES.has(source) ? source : "direct";

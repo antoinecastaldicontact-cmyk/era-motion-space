@@ -668,3 +668,39 @@ body {
 @media (max-height: 720px) {
   .bio-hero { justify-content: flex-start; }
 }
+
+/* ---- ERA Music outbound redirect page ---- */
+.out-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.out-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  width: min(100%, 420px);
+  padding: max(1.5rem, env(safe-area-inset-top)) 1.25rem
+    max(1.5rem, env(safe-area-inset-bottom));
+  text-align: center;
+}
+
+.out-cover {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+
+.out-status {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.out-fallback {
+  width: 100%;
+}
