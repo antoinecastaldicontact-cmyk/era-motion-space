@@ -170,7 +170,7 @@ function PlaylistPage({ playlist }: { playlist: Playlist }) {
       <div className="bio-grain" aria-hidden="true" />
 
       <section className="bio-hero" aria-labelledby="playlist-title">
-        <img className="bio-cover bio-enter bio-enter-1" src={playlist.cover} alt={`${playlist.title} playlist cover`} width={320} height={320} crossOrigin="anonymous" />
+        <img className="bio-cover bio-enter bio-enter-1" src={playlist.cover} alt={`${playlist.title} playlist cover`} width={320} height={320} />
         <h1 id="playlist-title" className="bio-title bio-enter bio-enter-2">{playlist.title}</h1>
         <p className="bio-hook bio-enter bio-enter-3">{playlist.hook}</p>
 
