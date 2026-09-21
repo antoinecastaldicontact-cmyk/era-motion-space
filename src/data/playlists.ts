@@ -10,7 +10,7 @@ export type Playlist = {
   deezer: string;
 };
 
-export const playlists: Playlist[] = [
+export const playlists: [Playlist] = [
   {
     slug: "edm-running-songs",
     spotifyId: "5ugaUSHdmdlUOrqBr94hoA",
