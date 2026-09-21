@@ -4,20 +4,37 @@ export type Playlist = {
   spotifyTitle: string;
   title: string;
   description: string;
+  hook: string;
+  body: string;
+  artists: string;
+  moments: string[];
   cover: string;
   spotify: string;
   apple: string;
   deezer: string;
+  stats?: {
+    spotify?: string;
+    apple?: string;
+    deezer?: string;
+  };
 };
 
-export const playlists: [Playlist] = [
+export const playlists: Playlist[] = [
   {
     slug: "edm-running-songs",
     spotifyId: "5ugaUSHdmdlUOrqBr94hoA",
     spotifyTitle:
       "EDM Running Songs 2026 🏃Energetic EDM to run | finding Running Motivation 🚀",
-    title: "Running Songs",
+    title: "EDM Running Songs",
     description: "The songs I run to.",
+    hook: "the songs everyone's running to this season.",
+    body: "You press play at the door. By the second song, the sun feels warmer. By the fifth, you're taking the long way home.",
+    artists: "126 songs. David Guetta, Robin Schulz, Ofenbach, MEDUZA, Tiësto and more.",
+    moments: [
+      "for golden hour",
+      "for the weekend 5K",
+      "for the sunday you almost stayed in",
+    ],
     cover:
       "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000d72c828617f3bd292988eb90c1e5",
     spotify: "https://open.spotify.com/playlist/5ugaUSHdmdlUOrqBr94hoA",

@@ -208,16 +208,18 @@ body {
 /* ---- ERA Music playlist bio ---- */
 .bio-page {
   --bio-white: #f5f5f2;
+  --bio-accent: #f5f5f2;
+  --bio-accent-rgb: 245 245 242;
   position: relative;
   isolation: isolate;
   min-height: 100dvh;
-  overflow: hidden;
   background: #0a0a0a;
   color: var(--bio-white);
 }
 
 .bio-backdrop,
-.bio-scrim {
+.bio-scrim,
+.bio-grain {
   position: fixed;
   inset: 0;
   pointer-events: none;
@@ -236,11 +238,26 @@ body {
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.75));
 }
 
-.bio-content {
+.bio-grain {
+  z-index: 10;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E");
+}
+
+.bio-hero,
+.bio-story {
   width: min(100%, 420px);
-  min-height: 100dvh;
   margin-inline: auto;
-  padding: max(2rem, env(safe-area-inset-top)) max(1.25rem, env(safe-area-inset-right)) max(1.5rem, env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
+  padding-inline: max(1.25rem, env(safe-area-inset-right));
+  padding-left: max(1.25rem, env(safe-area-inset-left));
+}
+
+.bio-hero {
+  position: relative;
+  min-height: 100dvh;
+  padding-top: max(2rem, env(safe-area-inset-top));
+  padding-bottom: max(4.5rem, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -257,16 +274,16 @@ body {
 }
 
 .bio-title {
-  margin-top: 1.75rem;
+  margin-top: 1.5rem;
   font-family: "N27", system-ui, sans-serif;
   font-size: clamp(1.75rem, 7vw, 2.5rem);
   font-weight: 600;
   line-height: 1.05;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
   color: var(--bio-white);
 }
 
-.bio-description {
+.bio-hook {
   margin-top: 0.65rem;
   font-family: "N27", system-ui, sans-serif;
   font-size: 1rem;
@@ -290,7 +307,7 @@ body {
   padding-inline: 1.25rem;
   border-radius: 14px;
   display: grid;
-  grid-template-columns: 1.5rem 1fr 1.5rem;
+  grid-template-columns: 22px 1fr 22px;
   align-items: center;
   gap: 0.875rem;
   font-size: 1rem;
@@ -305,9 +322,35 @@ body {
   grid-column: 2;
 }
 
+.bio-dsp-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.bio-dsp-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.15;
+}
+
+.bio-dsp-stat {
+  margin-top: 0.2rem;
+  font-size: 0.68rem;
+  font-weight: 300;
+  opacity: 0.58;
+}
+
 .bio-dsp-primary {
   background: var(--bio-white);
   color: #0a0a0a;
+  box-shadow: 0 8px 32px rgb(var(--bio-accent-rgb) / 35%);
+}
+
+.bio-dsp-primary .bio-dsp-icon {
+  color: #1db954;
 }
 
 .bio-dsp-glass {
@@ -328,20 +371,106 @@ body {
 }
 
 .bio-dsp:focus-visible,
-.bio-home:focus-visible {
-  outline: 2px solid var(--bio-white);
+.bio-home:focus-visible,
+.bio-share:focus-visible,
+.bio-sticky-listen:focus-visible {
+  outline: 2px solid var(--bio-accent);
   outline-offset: 3px;
 }
 
+.bio-scroll-cue {
+  position: absolute;
+  bottom: max(1.2rem, env(safe-area-inset-bottom));
+  left: 50%;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  opacity: 0.4;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.bio-story {
+  padding-top: 5rem;
+  padding-bottom: max(8rem, calc(env(safe-area-inset-bottom) + 6rem));
+  text-align: left;
+}
+
+.bio-body {
+  font-size: 1.125rem;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+.bio-artists {
+  margin-top: 2.5rem;
+  font-size: 0.74rem;
+  line-height: 1.7;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.bio-moments {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.bio-chip {
+  border: 1px solid color-mix(in srgb, var(--bio-accent) 58%, transparent);
+  border-radius: 999px;
+  padding: 0.55rem 0.85rem;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.78rem;
+  line-height: 1;
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+.bio-share {
+  width: 100%;
+  min-height: 56px;
+  margin-top: 3rem;
+  padding: 0.85rem 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--bio-white);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 500;
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  transition: transform 100ms ease-out, background-color 100ms ease-out;
+}
+
+.bio-share:active,
+.bio-sticky-listen:active {
+  transform: scale(0.97);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.bio-footer {
+  margin-top: 5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
 .bio-home {
-  margin-top: 2rem;
-  display: block;
+  display: inline-flex;
+  flex: none;
   opacity: 0.45;
   transition: opacity 100ms ease-out;
 }
 
 .bio-home img {
-  width: 4.5rem;
+  width: 4rem;
 }
 
 .bio-home:hover,
@@ -362,6 +491,93 @@ body {
 .bio-enter-5 { animation-delay: 200ms; }
 .bio-enter-6 { animation-delay: 250ms; }
 .bio-enter-7 { animation-delay: 300ms; }
+
+.bio-sticky {
+  position: fixed;
+  z-index: 20;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0.75rem max(1rem, env(safe-area-inset-right)) max(0.75rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(20, 20, 20, 0.55);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  transform: translateY(110%);
+  visibility: hidden;
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), visibility 300ms;
+}
+
+.bio-sticky-visible {
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.bio-sticky-inner {
+  width: min(100%, 420px);
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bio-sticky-cover {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.bio-sticky-title {
+  overflow: hidden;
+  font-size: 0.86rem;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bio-sticky-listen {
+  display: inline-flex;
+  height: 38px;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 7px;
+  padding-inline: 0.85rem;
+  background: var(--bio-white);
+  color: #0a0a0a;
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: transform 100ms ease-out;
+}
+
+.bio-sticky-listen .bio-dsp-icon {
+  width: 17px;
+  height: 17px;
+  color: #1db954;
+}
+
+.bio-not-found {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.bio-not-found img { width: 8rem; }
+.bio-not-found a {
+  color: var(--fg);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-decoration: underline;
+  text-underline-offset: 0.5rem;
+  text-transform: uppercase;
+}
 
 .bio-dsp-glass.bio-enter {
   -webkit-backdrop-filter: blur(0) saturate(180%);
@@ -395,13 +611,21 @@ body {
   }
 
   .bio-dsp,
-  .bio-home {
+  .bio-home,
+  .bio-share,
+  .bio-sticky,
+  .bio-sticky-listen {
     transition: none;
   }
 
-  .bio-dsp:active {
+  .bio-dsp:active,
+  .bio-share:active,
+  .bio-sticky-listen:active {
     transform: none;
   }
+
+  .bio-sticky { transform: none; opacity: 0; }
+  .bio-sticky-visible { opacity: 1; }
 }
 
 @keyframes bio-fade {
@@ -410,7 +634,10 @@ body {
 
 @media (prefers-reduced-transparency: reduce) {
   .bio-dsp-glass,
-  .bio-dsp-glass.bio-enter {
+  .bio-dsp-glass.bio-enter,
+  .bio-chip,
+  .bio-share,
+  .bio-sticky {
     background: rgba(30, 30, 30, 0.95);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
@@ -418,9 +645,14 @@ body {
 }
 
 @media (prefers-contrast: more) {
-  .bio-description { color: #fff; }
+  .bio-hook,
+  .bio-artists,
+  .bio-footer { color: #fff; }
   .bio-dsp-glass,
-  .bio-dsp-glass.bio-enter {
+  .bio-dsp-glass.bio-enter,
+  .bio-chip,
+  .bio-share,
+  .bio-sticky {
     background: #1e1e1e;
     border: 1px solid #fff;
     -webkit-backdrop-filter: none;
@@ -429,5 +661,5 @@ body {
 }
 
 @media (max-height: 720px) {
-  .bio-content { justify-content: flex-start; }
+  .bio-hero { justify-content: flex-start; }
 }
