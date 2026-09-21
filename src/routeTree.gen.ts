@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BioRouteImport } from './routes/bio'
 import { Route as ManifestoRouteImport } from './routes/manifesto'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BioRoute = BioRouteImport.update({
+  id: '/bio',
+  path: '/bio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ManifestoRoute = ManifestoRouteImport.update({
@@ -25,27 +31,31 @@ const ManifestoRoute = ManifestoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/bio': typeof BioRoute
   '/manifesto': typeof ManifestoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/bio': typeof BioRoute
   '/manifesto': typeof ManifestoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/bio': typeof BioRoute
   '/manifesto': typeof ManifestoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/manifesto'
+  fullPaths: '/' | '/bio' | '/manifesto'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/manifesto'
-  id: '__root__' | '/' | '/manifesto'
+  to: '/' | '/bio' | '/manifesto'
+  id: '__root__' | '/' | '/bio' | '/manifesto'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BioRoute: typeof BioRoute
   ManifestoRoute: typeof ManifestoRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bio': {
+      id: '/bio'
+      path: '/bio'
+      fullPath: '/bio'
+      preLoaderRoute: typeof BioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/manifesto': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BioRoute: BioRoute,
   ManifestoRoute: ManifestoRoute,
 }
 export const routeTree = rootRouteImport
